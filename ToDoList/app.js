@@ -1,3 +1,4 @@
+const { menuInteractivo, pausaIteractiva } = require("./helpers/inquirer");
 const { mostrarMenu, pausa } = require("./helpers/mensajes");
 
 require("colors");
@@ -7,7 +8,8 @@ let opt = "";
 iniciar();
 async function iniciar() {
   do {
-    opt = await mostrarMenu();
-    if (opt !== "0") await pausa();
+    if (opt !== "0") await pausaIteractiva();
+    console.log({ opt });
+    opt = await menuInteractivo();
   } while (opt !== "0");
 }
