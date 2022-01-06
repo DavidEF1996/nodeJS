@@ -40,9 +40,9 @@ class Tareas {
   }
 
   listarPendientesCompletadas(completadas = false) {
-    console.log(completadas);
     if (completadas) {
-      const complete = this.listado.filter((item) => item.completado === true);
+      const complete = this.listado.filter((item) => item.completado != null);
+
       complete.forEach((element, index) => {
         const idx = `${index + 1}`.green;
         const { descripcion, completado } = element;
@@ -50,7 +50,8 @@ class Tareas {
         console.log(`${idx} ${descripcion} :: ${estado}`);
       });
     } else {
-      const complete = this.listado.filter((item) => item.completado !== true);
+      const complete = this.listado.filter((item) => item.completado === null);
+
       complete.forEach((element, index) => {
         const idx = `${index + 1}`.green;
         const { descripcion, completado } = element;
@@ -64,6 +65,22 @@ class Tareas {
     if (this._listado[id]) {
       delete this._listado[id];
     }
+  }
+
+  actualizarTareas(ids = []) {
+    ids.forEach((element) => {
+      const tarea = this._listado[element];
+      if (!tarea.completado) {
+        console.log("entro");
+        tarea.completado = new Date().toISOString();
+      }
+    });
+
+    this.listado.forEach((element) => {
+      if (!ids.includes(element.id)) {
+        this._listado[element.id].completado = null;
+      }
+    });
   }
 }
 

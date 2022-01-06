@@ -5,6 +5,7 @@ const {
   escuchar,
   menuEliminar,
   confirmarEliminacion,
+  menuActualizar,
 } = require("./helpers/inquirer");
 const { mostrarMenu, pausa } = require("./helpers/mensajes");
 const Tarea = require("./models/tarea");
@@ -41,17 +42,24 @@ async function iniciar() {
       case "4":
         tareas.listarPendientesCompletadas(false);
         break;
+      case "5":
+        const ids = await menuActualizar(tareas.listado);
+        tareas.actualizarTareas(ids);
+        break;
 
       case "6":
         const id = await menuEliminar(tareas.listado);
-        const confirmar = await confirmarEliminacion(
-          "¿Está seguro de eliminar?"
-        );
-        if (confirmar) {
-          tareas.eliminarTarea(id);
-          console.log("Tarea borrada");
+        if (id !== "0") {
+          const confirmar = await confirmarEliminacion(
+            "¿Está seguro de eliminar?"
+          );
+          if (confirmar) {
+            tareas.eliminarTarea(id);
+            console.log("Tarea borrada");
+          } else {
+            console.log("No se realizaron cambios");
+          }
         }
-
         break;
     }
     guardar(tareas.listado);

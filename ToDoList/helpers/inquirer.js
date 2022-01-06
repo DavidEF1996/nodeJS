@@ -90,6 +90,10 @@ async function menuEliminar(arreglo = []) {
       name: `${idx} ${tarea.descripcion}`,
     };
   });
+  choices.unshift({
+    value: "0",
+    name: "0.".green + "Cancelar",
+  });
 
   const preguntas = [
     {
@@ -117,10 +121,34 @@ async function confirmarEliminacion(message = "") {
   return ok;
 }
 
+async function menuActualizar(arreglo = []) {
+  const choices = arreglo.map((tarea, i) => {
+    const idx = `${i + 1}.`.green;
+    return {
+      value: tarea.id,
+      name: `${idx} ${tarea.descripcion}`,
+      checked: tarea.completado ? true : false,
+    };
+  });
+
+  const preguntas = [
+    {
+      type: "checkbox",
+      name: "ids",
+      message: "Seleccione",
+      choices,
+    },
+  ];
+
+  const { ids } = await inquirer.prompt(preguntas);
+  return ids;
+}
+
 module.exports = {
   menuInteractivo,
   pausaIteractiva,
   escuchar,
   menuEliminar,
   confirmarEliminacion,
+  menuActualizar,
 };
