@@ -1,4 +1,5 @@
 const inquirer = require("inquirer");
+const { validate } = require("uuid");
 
 const preguntas = [
   {
@@ -62,7 +63,27 @@ async function pausaIteractiva() {
   return opcon;
 }
 
+async function escuchar(message) {
+  const pregunta = [
+    {
+      type: "input",
+      name: "descr",
+      message,
+      validate(value) {
+        if (value.length === 0) {
+          return "No puede ir vacío";
+        }
+        return true;
+      },
+    },
+  ];
+
+  const { descr } = await inquirer.prompt(pregunta);
+  return descr;
+}
+
 module.exports = {
   menuInteractivo,
   pausaIteractiva,
+  escuchar,
 };
