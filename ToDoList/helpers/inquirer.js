@@ -82,8 +82,45 @@ async function escuchar(message) {
   return descr;
 }
 
+async function menuEliminar(arreglo = []) {
+  const choices = arreglo.map((tarea, i) => {
+    const idx = `${i + 1}.`.green;
+    return {
+      value: tarea.id,
+      name: `${idx} ${tarea.descripcion}`,
+    };
+  });
+
+  const preguntas = [
+    {
+      type: "list",
+      name: "id",
+      message: "Borrar",
+      choices,
+    },
+  ];
+
+  const { id } = await inquirer.prompt(preguntas);
+  return id;
+}
+
+async function confirmarEliminacion(message = "") {
+  const question = [
+    {
+      type: "confirm",
+      name: "ok",
+      message,
+    },
+  ];
+
+  const { ok } = await inquirer.prompt(question);
+  return ok;
+}
+
 module.exports = {
   menuInteractivo,
   pausaIteractiva,
   escuchar,
+  menuEliminar,
+  confirmarEliminacion,
 };

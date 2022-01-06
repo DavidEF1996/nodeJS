@@ -3,6 +3,8 @@ const {
   menuInteractivo,
   pausaIteractiva,
   escuchar,
+  menuEliminar,
+  confirmarEliminacion,
 } = require("./helpers/inquirer");
 const { mostrarMenu, pausa } = require("./helpers/mensajes");
 const Tarea = require("./models/tarea");
@@ -29,10 +31,30 @@ async function iniciar() {
         tareas.crear(recibir);
         break;
       case "2":
-        console.log(tareas.listado);
+        tareas.listarTodo();
+        break;
+
+      case "3":
+        tareas.listarPendientesCompletadas(true);
+        break;
+
+      case "4":
+        tareas.listarPendientesCompletadas(false);
+        break;
+
+      case "6":
+        const id = await menuEliminar(tareas.listado);
+        const confirmar = await confirmarEliminacion(
+          "¿Está seguro de eliminar?"
+        );
+        if (confirmar) {
+          tareas.eliminarTarea(id);
+          console.log("Tarea borrada");
+        }
+
         break;
     }
-    // guardar(tareas.listado);
+    guardar(tareas.listado);
     await pausaIteractiva();
   } while (opt !== "0");
 
