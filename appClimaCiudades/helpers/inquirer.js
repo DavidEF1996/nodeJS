@@ -65,12 +65,12 @@ async function escuchar(message) {
   return descr;
 }
 
-async function menuEliminar(arreglo = []) {
-  const choices = arreglo.map((tarea, i) => {
+async function menuElegirLugar(arreglo = []) {
+  const choices = arreglo.map((lugar, i) => {
     const idx = `${i + 1}.`.green;
     return {
-      value: tarea.id,
-      name: `${idx} ${tarea.descripcion}`,
+      value: lugar.id,
+      name: `${idx} ${lugar.name}`,
     };
   });
   choices.unshift({
@@ -82,7 +82,7 @@ async function menuEliminar(arreglo = []) {
     {
       type: "list",
       name: "id",
-      message: "Borrar",
+      message: "Seleccione",
       choices,
     },
   ];
@@ -131,7 +131,7 @@ module.exports = {
   menuInteractivo,
   pausaIteractiva,
   escuchar,
-  menuEliminar,
+  menuElegirLugar,
   confirmarEliminacion,
   menuActualizar,
 };
