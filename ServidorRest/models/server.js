@@ -21,8 +21,33 @@ class Server {
 
   routes() {
     //tenemos una ruta de ejemplo por defecto con este path
-    this.app.get("/hola", (req, res) => {
-      res.send("hola mundo");
+    //this.app.get("/hola", (req, res) => {
+    //res.send("hola get");
+    //});
+
+    //Operaciones básicas, la ruta api direccionará a alguna de estas rutas cuando se mande el parámetro de get, post, put, delete
+    this.app.get("/api", (req, res) => {
+      res.status(500).json({
+        msg: "get",
+      });
+    });
+
+    this.app.post("/api", (req, res) => {
+      res.status(200).json({
+        msg: "post",
+      });
+    });
+
+    this.app.put("/api", (req, res) => {
+      res.status(200).json({
+        msg: "put",
+      });
+    });
+
+    this.app.delete("/api", (req, res) => {
+      res.status(200).json({
+        msg: "delete",
+      });
     });
   }
 
