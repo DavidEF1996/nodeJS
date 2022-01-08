@@ -1,4 +1,5 @@
 const express = require("express"); //importacion de express
+const cors = require("cors"); //improtacion de cors
 
 class Server {
   //clase que iniciara un servidor
@@ -6,6 +7,7 @@ class Server {
   constructor() {
     this.app = express(); // iniciamos express en esta variable
     this.port = process.env.PORT; // especificamos el puerto global de .env
+    this.usersRoute = "/api/users";
 
     //llamamos los middleware que estemos usando
     this.middlewares();
@@ -15,6 +17,12 @@ class Server {
   }
 
   middlewares() {
+    //Cors
+    this.app.use(cors());
+
+    //middleware para usar json de las peticiones post put, etc
+    this.app.use(express.json());
+
     //especificamos la ruta por defecto http......localhost:8080 va a apuntar a la página index de la carpeta pública
     this.app.use(express.static("public"));
   }
@@ -25,30 +33,7 @@ class Server {
     //res.send("hola get");
     //});
 
-    //Operaciones básicas, la ruta api direccionará a alguna de estas rutas cuando se mande el parámetro de get, post, put, delete
-    this.app.get("/api", (req, res) => {
-      res.status(500).json({
-        msg: "get",
-      });
-    });
-
-    this.app.post("/api", (req, res) => {
-      res.status(200).json({
-        msg: "post",
-      });
-    });
-
-    this.app.put("/api", (req, res) => {
-      res.status(200).json({
-        msg: "put",
-      });
-    });
-
-    this.app.delete("/api", (req, res) => {
-      res.status(200).json({
-        msg: "delete",
-      });
-    });
+    this.app.use(this.usersRoute, require("../routes/users")); //Este es un middleware que identifica las solicitudes por esta ruta
   }
 
   listen() {
