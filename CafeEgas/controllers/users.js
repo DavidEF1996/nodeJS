@@ -1,4 +1,6 @@
 const { response } = require("express");
+const { validationResult } = require("express-validator");
+const bcrypt = require("bcryptjs");
 const User = require("../models/user");
 
 const getUsers = (req, res = response) => {
@@ -18,13 +20,18 @@ const getUsersWithParams = (req, res = response) => {
 };
 
 async function postUsers(req, res = response) {
-  const body = req.body; // recibimos los datos en formato json
-  const user = new User(body); //pasamos los datos al esquema
+  const { nombre, apellido, correo, password, rol } = req.body; // recibimos los datos en formato json
+  const user = new User({ nombre, apellido, correo, password, rol }); //pasamos los datos al esquema
+
+  //Encriptar contraseña
+  const salt = bcrypt.genSaltSync(10);
+  user.password = bcrypt.hashSync(password, salt);
+
   await user.save(); //guardamos en la base de datos
-  const { name } = req.body;
-  res.status(200).json({
-    msg: "post controller",
-    name,
+
+  res.json({
+    msg: "Insertado correctamente",
+    user,
   });
 }
 
