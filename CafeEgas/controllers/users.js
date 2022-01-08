@@ -3,19 +3,36 @@ const { validationResult } = require("express-validator");
 const bcrypt = require("bcryptjs");
 const User = require("../models/user");
 
-const getUsers = (req, res = response) => {
+const getUsers = async (req, res = response) => {
   //hicimos el res = response para poder tener las ayudas de vs sobre json, status, etc
+
+  const usuarios = await User.find();
   res.status(200).json({
-    msg: "get controller",
+    msg: "Lista de Usuariosr",
+    usuarios,
   });
 };
-const getUsersWithParams = (req, res = response) => {
+const getUsersWithParams = async (req, res = response) => {
   //hicimos el res = response para poder tener las ayudas de vs sobre json, status, etc
-  const { nombre = "NA", apellido = "NA" } = req.query;
+  const { limit = 5, desde = 0 } = req.query; //son las restriccciones de la consulta
+  //------------------------------------------
+  /*
+  const usuarios = await User.find({ estado: true })
+    .skip(Number(desde))
+    .limit(Number(limit)); //se pone estado = true para que solo traiga los usuarios activos y no los eliminados
+  const totalUsuarios = await User.countDocuments({ estado: true });*/
+  //FORMA POCO OPTIMA
+  //---------------------------
+
+  const [totalUsuarios, usuarios] = await Promise.all([
+    User.countDocuments({ estado: true }),
+    User.find({ estado: true }).skip(Number(desde)).limit(Number(limit)),
+  ]);
+
   res.status(200).json({
-    msg: "get controller",
-    nombre,
-    apellido,
+    msg: "Lista parametrizada",
+    totalRegistros: totalUsuarios,
+    usuarios,
   });
 };
 
