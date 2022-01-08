@@ -49,6 +49,14 @@ router.put(
   putUsers
 );
 
-router.delete("/", deleteUsers);
+router.delete(
+  "/:id",
+  [
+    check("id", "No es un id de Mongo válido").isMongoId(), //verifica si es un id de mongo
+    check("id").custom(existUserById), //verifica con una personalizada si existe el id de mongo
+    validarCampos,
+  ],
+  deleteUsers
+);
 
 module.exports = router; // se exporta el router

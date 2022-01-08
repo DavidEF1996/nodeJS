@@ -6,9 +6,11 @@ const User = require("../models/user");
 const getUsers = async (req, res = response) => {
   //hicimos el res = response para poder tener las ayudas de vs sobre json, status, etc
 
-  const usuarios = await User.find();
+  const usuarios = await User.find({ estado: true });
+  const totalRegistros = await User.countDocuments({ estado: true });
   res.status(200).json({
     msg: "Lista de Usuariosr",
+    totalRegistros: totalRegistros,
     usuarios,
   });
 };
@@ -52,9 +54,12 @@ async function postUsers(req, res = response) {
   });
 }
 
-function deleteUsers(req, res = response) {
+async function deleteUsers(req, res = response) {
+  const { id } = req.params;
+  const usuario = await User.findByIdAndUpdate(id, { estado: false }); //Buscamos el usuario con ese id y actualizamos el estado para que no aparezca en los select
   res.status(200).json({
-    msg: "delete controller",
+    msg: "Usuario Eliminado",
+    usuario,
   });
 }
 
