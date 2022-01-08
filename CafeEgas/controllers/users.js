@@ -41,11 +41,21 @@ function deleteUsers(req, res = response) {
   });
 }
 
-function putUsers(req, res = response) {
-  const id = req.params.id;
+async function putUsers(req, res = response) {
+  const { id } = req.params;
+  const { password, google, correo, ...resto } = req.body;
+
+  if (password) {
+    const salt = bcrypt.genSaltSync(10);
+    resto.password = bcrypt.hashSync(password, salt);
+  }
+
+  const usuarioActualizado = await User.findByIdAndUpdate(id, resto);
+
+  console.log(resto);
   res.status(200).json({
-    msg: "put controller",
-    id,
+    msg: "Usuario Actualizado",
+    usuarioActualizado,
   });
 }
 

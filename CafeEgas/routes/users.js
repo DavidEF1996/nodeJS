@@ -8,7 +8,11 @@ const {
   deleteUsers,
   getUsersWithParams,
 } = require("../controllers/users");
-const { exisRol, existEmail } = require("../helpers/db-validations");
+const {
+  exisRol,
+  existEmail,
+  existUserById,
+} = require("../helpers/db-validations");
 
 const router = Router();
 
@@ -34,7 +38,16 @@ router.post(
 );
 
 //al especificarle el id va a ir a los parametros y podremos recibir el id
-router.put("/:id", putUsers);
+router.put(
+  "/:id",
+  [
+    check("id", "No es un id de Mongo válido").isMongoId(), //verifica si es un id de mongo
+    check("id").custom(existUserById), //verifica con una personalizada si existe el id de mongo
+    check("rol").custom(exisRol), //verifica el rol
+    validarCampos,
+  ],
+  putUsers
+);
 
 router.delete("/", deleteUsers);
 
