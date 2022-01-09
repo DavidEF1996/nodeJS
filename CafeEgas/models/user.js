@@ -40,7 +40,8 @@ const UserSchema = Schema({
 });
 
 UserSchema.methods.toJSON = function () {
-  const { __v, password, ...user } = this.toObject();
+  const { __v, password, _id, ...user } = this.toObject();
+  user.uid = _id; // extraemos el _id para volverlo a guardar en una propiedad uid para que visualmente aparezca así en las consultas
   return user;
 };
 

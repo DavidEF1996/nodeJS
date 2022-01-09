@@ -10,6 +10,7 @@ class Server {
     this.app = express(); // iniciamos express en esta variable
     this.port = process.env.PORT; // especificamos el puerto global de .env
     this.usersRoute = "/api/users";
+    this.authPath = "/api/auth"; //es la ruta para la autenticacion
 
     //Llamamos a la base al inicair esta instancia
     this.conectarBD();
@@ -43,6 +44,7 @@ class Server {
     //});
 
     this.app.use(this.usersRoute, require("../routes/users")); //Este es un middleware que identifica las solicitudes por esta ruta
+    this.app.use(this.authPath, require("../routes/auth"));
   }
 
   listen() {
