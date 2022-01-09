@@ -13,6 +13,11 @@ const {
   existEmail,
   existUserById,
 } = require("../helpers/db-validations");
+const { validarToken } = require("../middlewares/validar-jwt");
+const {
+  esAdminRole,
+  tieneAlgunoDeEstosRoles,
+} = require("../middlewares/validar-rol");
 
 const router = Router();
 
@@ -52,6 +57,9 @@ router.put(
 router.delete(
   "/:id",
   [
+    validarToken,
+    //esAdminRole,
+    tieneAlgunoDeEstosRoles("ADMIN_ROLE", "USER_ROLE"),
     check("id", "No es un id de Mongo válido").isMongoId(), //verifica si es un id de mongo
     check("id").custom(existUserById), //verifica con una personalizada si existe el id de mongo
     validarCampos,

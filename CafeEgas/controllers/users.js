@@ -57,9 +57,11 @@ async function postUsers(req, res = response) {
 async function deleteUsers(req, res = response) {
   const { id } = req.params;
   const usuario = await User.findByIdAndUpdate(id, { estado: false }); //Buscamos el usuario con ese id y actualizamos el estado para que no aparezca en los select
+  const usuarioAutenticado = req.usuario;
   res.status(200).json({
     msg: "Usuario Eliminado",
-    usuario,
+    usuarioEliminado: usuario,
+    usuarioAutenticado: usuarioAutenticado,
   });
 }
 
