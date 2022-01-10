@@ -4,9 +4,59 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>LLegue</title>
+    <title>Login CafeEgas</title>
   </head>
   <body>
-    <h1>LLegue</h1>
+    <h1>Login de Usuarios Café Egas</h1>
+
+    <div
+      id="g_id_onload"
+      data-client_id="66865222192-achi4ckij189eu9iru2v06b3slkk9ktu.apps.googleusercontent.com"
+      data-callback="handleCredentialResponse"
+      data-auto_prompt="false"
+    ></div>
+    <div
+      class="g_id_signin"
+      data-type="standard"
+      data-size="large"
+      data-theme="outline"
+      data-text="sign_in_with"
+      data-shape="rectangular"
+      data-logo_alignment="left"
+    ></div>
+
+    <button id="sing-out">Salir</button>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+    <script>
+      function handleCredentialResponse(response) {
+        const url = "http://localhost:8080/api/auth/google";
+        const body = { id_token: response.credential };
+
+        fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(body),
+        })
+          .then((res) => res.json())
+          .then((res) => {
+            console.log(res);
+            localStorage.setItem("email", res.usuarioBd.correo);
+          })
+          .catch(console.warn);
+      }
+
+      const boton = document.querySelector("#sing-out");
+      boton.onclick = () => {
+        console.log(localStorage.getItem("email"));
+        google.accounts.id.disableAutoSelect();
+        google.accounts.id.revoke(localStorage.getItem("email"), (done) => {
+          localStorage.clear();
+          location.reload();
+        });
+      };
+    </script>
   </body>
 </html>
