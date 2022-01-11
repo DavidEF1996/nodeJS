@@ -23,6 +23,11 @@ const VeterinariaSchema = {
     trim: true,
     require: [true, "La hora es obligatoria"],
   },
+  telefono: {
+    type: String,
+    trim: true,
+    require: [true, "El telefono es obligatorio"],
+  },
   sintomas: {
     type: String,
     trim: true,
