@@ -2,7 +2,6 @@ const { response } = require("express");
 const Categoria = require("../models/categorias");
 
 async function crearCategoria(req, res = response) {
-  console.log(req.user);
   const nombre = req.body.nombre.toUpperCase(); // sacamos el nombre para guardarlo en mayúsculas
 
   const categoriaBD = await Categoria.findOne({ nombre }); //buscamos si existe esta categoría en la base

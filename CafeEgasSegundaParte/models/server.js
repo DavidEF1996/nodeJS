@@ -13,7 +13,8 @@ class Server {
     this.rutas = {
       usuarios: "/api/users",
       autenticacion: "/api/auth",
-      productos: "/api/products",
+      categorias: "/api/categorias",
+      productos: "/api/productos",
     };
 
     //Llamamos a la base al inicair esta instancia
@@ -49,7 +50,8 @@ class Server {
 
     this.app.use(this.rutas.usuarios, require("../routes/users")); //Este es un middleware que identifica las solicitudes por esta ruta
     this.app.use(this.rutas.autenticacion, require("../routes/auth"));
-    this.app.use(this.rutas.productos, require("../routes/products"));
+    this.app.use(this.rutas.categorias, require("../routes/products")); //el modelo es products sin embargo debería ser categorias
+    this.app.use(this.rutas.productos, require("../routes/productos"));
   }
 
   listen() {

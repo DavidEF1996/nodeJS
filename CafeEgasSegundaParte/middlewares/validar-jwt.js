@@ -1,6 +1,8 @@
 const { response, request } = require("express");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
+const Categoria = require("../models/categorias");
+const Producto = require("../models/productos");
 
 const validarToken = async (req = request, res = response, next) => {
   const token = req.header("x-token"); //recibimos el token mandado en los headers de postman
@@ -38,6 +40,23 @@ const validarToken = async (req = request, res = response, next) => {
   }
 };
 
+async function existeCategoria(id) {
+  const recibirCat = await Categoria.findById(id);
+  if (!recibirCat) {
+    throw new Error("La categoria no existe");
+  }
+}
+
+async function existeProducto(id) {
+  const recibirCat = await Producto.findById(id);
+
+  if (!recibirCat) {
+    throw new Error("El producto no existe");
+  }
+}
+
 module.exports = {
   validarToken,
+  existeCategoria,
+  existeProducto,
 };
