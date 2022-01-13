@@ -16,6 +16,7 @@ class Server {
       categorias: "/api/categorias",
       productos: "/api/productos",
       busquedas: "/api/buscar",
+      uploads: "/api/subirArchivos",
     };
 
     //Llamamos a la base al inicair esta instancia
@@ -54,6 +55,7 @@ class Server {
     this.app.use(this.rutas.categorias, require("../routes/products")); //el modelo es products sin embargo debería ser categorias
     this.app.use(this.rutas.productos, require("../routes/productos"));
     this.app.use(this.rutas.busquedas, require("../routes/busquedas"));
+    this.app.use(this.rutas.uploads, require("../routes/upload"));
   }
 
   listen() {
