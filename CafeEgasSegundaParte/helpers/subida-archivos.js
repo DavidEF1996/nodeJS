@@ -36,6 +36,15 @@ const validarArchivos = (
   });
 };
 
+const colecccionesPermitidas = (coleccion = "", colecciones = []) => {
+  const recibir = colecciones.includes(coleccion); // si le incluye por defecto existe entonces..
+  if (!recibir) {
+    throw new Error("La colección no es permitida");
+  }
+  return true;
+};
+
 module.exports = {
   validarArchivos,
+  colecccionesPermitidas,
 };
