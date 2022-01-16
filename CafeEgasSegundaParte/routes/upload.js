@@ -3,6 +3,6 @@ const { subirArchivo } = require("../controllers/upload");
 
 const router = Router();
 
-router.get("/", subirArchivo);
+router.post("/", subirArchivo);
 
 module.exports = router;

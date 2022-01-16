@@ -2,6 +2,7 @@ const express = require("express"); //importacion de express
 const cors = require("cors"); //improtacion de cors
 const mongoose = require("mongoose"); //importamos moongose como base de datos
 const { dbConnection } = require("../database/config");
+const fileUpload = require("express-fileupload");
 
 class Server {
   //clase que iniciara un servidor
@@ -42,6 +43,14 @@ class Server {
 
     //especificamos la ruta por defecto http......localhost:8080 va a apuntar a la página index de la carpeta pública
     this.app.use(express.static("public"));
+
+    this.app.use(
+      fileUpload({
+        useTempFiles: true,
+        tempFileDir: "/tmp/",
+        createParentPath: true, // esto es para poder crear subdirectorios
+      })
+    );
   }
 
   routes() {
