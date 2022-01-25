@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./css/estilos.css" type="text/css" />
+    <title>Login CafeEgas</title>
+  </head>
+  <body>
+    <div class="contenedor">
+      <div class="google">
+        <h1>Login de Google</h1>
+        <div
+          id="g_id_onload"
+          data-client_id="66865222192-achi4ckij189eu9iru2v06b3slkk9ktu.apps.googleusercontent.com"
+          data-callback="handleCredentialResponse"
+          data-auto_prompt="true"
+        ></div>
+        <div
+          class="g_id_signin"
+          data-type="standard"
+          data-size="large"
+          data-theme="outline"
+          data-text="sign_in_with"
+          data-shape="rectangular"
+          data-logo_alignment="left"
+        ></div>
+
+        <button id="sing-out">Salir</button>
+      </div>
+      <div class="manual">
+        <h1>Login Manual</h1>
+
+        <form id="login-manual">
+          <label for="correo">Correo </label>
+          <input
+            name="correo"
+            type="email"
+            placeholder="correo@correo.com"
+            id="correo"
+          />
+
+          <label for="password">Contraseña </label>
+          <input name="password" type="password" id="password" />
+
+          <input class="enviar" type="submit" value="empezar" />
+        </form>
+      </div>
+    </div>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+    <script>
+      function handleCredentialResponse(response) {
+        const url = "http://localhost:8080/api/auth/";
+        const body = { id_token: response.credential };
+
+        fetch(url + "google", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(body),
+        })
+          .then((res) => res.json())
+          .then(({ toke }) => {
+            localStorage.setItem("token", toke);
+
+            window.location = "chat.html";
+          })
+          .catch(console.warn);
+      }
+
+      const boton = document.querySelector("#sing-out");
+      boton.onclick = () => {
+        console.log(localStorage.getItem("toke"));
+        google.accounts.id.disableAutoSelect();
+        google.accounts.id.revoke(localStorage.getItem("email"), (done) => {
+          localStorage.clear();
+          location.reload();
+        });
+      };
+
+      const formulario = document.querySelector("#login-manual");
+
+      formulario.addEventListener("submit", (e) => {
+        e.preventDefault();
+        let formdata = {};
+        for (let el of formulario.elements) {
+          if (el.name.length > 0) {
+            formdata[el.name] = el.value;
+          }
+        }
+
+        console.log(formdata);
+
+        const url = "http://localhost:8080/api/auth/";
+        fetch(url + "login", {
+          method: "POST",
+          body: JSON.stringify(formdata),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+          .then((res) => res.json())
+          .then(({ toke, usuario }) => {
+            localStorage.setItem("token", toke);
+
+            window.location = "chat.html";
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      });
+    </script>
+  </body>
+</html>
