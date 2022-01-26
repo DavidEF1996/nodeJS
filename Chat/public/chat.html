@@ -11,13 +11,19 @@
   <body>
     <div class="contenedor">
       <div>
-        <h1>Sala</h1>
+        <h1>Salas de Chat</h1>
+        <a href="#" id="videojuegos">Juegos</a>
+        <a href="#" id="peliculas">Cine</a>
         <hr />
         <button id="btnSalir">Salir</button>
         <ul id="ulUsuarios"></ul>
       </div>
 
       <div>
+        <h2>
+          Conectado con: <spam class="receptor">...</spam
+          ><spam style="display: none" , id="correo-chat"></spam>
+        </h2>
         <input type="text" id="txtUid" placeholder="id" autocomplete="off" />
         <input
           type="text"
@@ -25,6 +31,9 @@
           placeholder="mensaje"
           autocomplete="off"
         />
+      </div>
+      <div>
+        <ul id="ulMensajes"></ul>
       </div>
     </div>
 

@@ -55,7 +55,9 @@ class Server {
   }
 
   sockets() {
-    this.io.on("connection", socketController);
+    // this.io.on("connection", socketController);
+    //Cambiamos la estructura para que envíe una función de flecha donde irá el socket y llamamos al método de sockeController que ahora recibe el io, de esta forma podemos mandar ambos parámetros
+    this.io.on("connection", (socket) => socketController(socket, this.io));
   }
   listen() {
     //inicia la app en el puerto especificado
