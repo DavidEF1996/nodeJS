@@ -72,8 +72,18 @@ class ChatMensajes {
     //fs.writeFileSync(this.path+"ejemplo", {encoding:"utf-8"});
   }
 
+  guardarPrivadosBD(involucrados = "") {
+    if (this.ultimos10Privados.length === 1) {
+      return;
+    }
+    fs.writeFileSync(
+      this.path + involucrados + ".json",
+      JSON.stringify(this.ultimos10Privados)
+    );
+  }
+
   leerBD() {
-    if (!fs.existsSync(this.path + "globales.json")) {
+    if (!fs.existsSync(this.path + "global.json")) {
       return;
     }
     const info = fs.readFileSync(this.path + "global.json", {

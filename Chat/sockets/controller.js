@@ -17,14 +17,7 @@ const socketController = async (socket, io) => {
 
   //1. Agregar usuario conectado
   chatMensajes.agregarUsuarios(usuario);
-  io.emit(
-    "recibir-mensajes",
-    chatMensajes.ultimos10 || chatMensajes.cargarChatGlobales
-  );
-
-  socket.emit("cargar-todo", (payload) => {
-    console.log(payload);
-  });
+  io.emit("recibir-mensajes", chatMensajes.ultimos10);
 
   //1.1 Agregar usuario a sala
   socket.join(usuario.correo);
@@ -32,6 +25,7 @@ const socketController = async (socket, io) => {
   //CARGAR LISTA DE USUARIOS
   chatMensajes.cargarChatGlobales();
   io.emit("usuarios-activos", chatMensajes.usuariosConectados);
+  io.emit("recibir-mensajes", chatMensajes.ultimos10);
 
   //LIMPIAR USUARIO DESCONECTADO
   socket.on("disconnect", () => {
@@ -71,17 +65,29 @@ const socketController = async (socket, io) => {
       nombreBase = `de:${usuario.nombre}`;
       console.log(nombreBase);
 
-      chatMensajes.guardarBD(tipo, nombreBase);
+      //chatMensajes.guardarBD(tipo, nombreBase);
       chatMensajes.enviarMensajePrivado(usuario.uid, usuario.nombre, mensaje);
       // Mensaje privado
       socket.to(uid).emit("mensaje-privado", { de: usuario.nombre, mensaje });
+      io.emit("recibir-mensajes-privados", chatMensajes.ultimos10Privados);
     } else {
       nombreBase = "global";
 
       chatMensajes.enviarMensaje(usuario.id, usuario.nombre, mensaje);
 
-      io.emit("recibir-mensajes", chatMensajes.ultimos10);
+      io.to("videojuegos").emit("recibir-mensajes", chatMensajes.ultimos10);
     }
+  });
+
+  socket.on("cargar-todo", (payload) => {
+    socket.join("videojuegos");
+    io.emit("recibir-mensajes", chatMensajes.ultimos10);
+  });
+
+  socket.on("grabar-mensajes-privados", (payload) => {
+    const involucrados = usuario.correo + "-" + payload;
+
+    chatMensajes.guardarPrivadosBD(involucrados);
   });
 };
 

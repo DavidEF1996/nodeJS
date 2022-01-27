@@ -60,6 +60,8 @@ async function conectar() {
 
   socket.on("usuarios-activos", dibujarUsuarios);
 
+  socket.on("recibir-mensajes-privados", dibujarMensajes);
+
   socket.on("mensaje-privado", (payload) => {
     console.log(payload);
   });
@@ -93,7 +95,6 @@ const dibujarUsuarios = (usuarios = []) => {
           <li class="users" id="${correo}">
               <p>
                   <h5 class="text-success"> ${nombre} </h5>
-                  <span class="fs-6 text-muted">${uid}</span>
               </p>
           </li>
       `;
@@ -127,7 +128,6 @@ const dibujarUsuarios = (usuarios = []) => {
 }*/
 
 const dibujarMensajes = (mensajes = []) => {
-  console.log(mensajes);
   let mensajesHTML = "";
   mensajes.forEach(({ nombre, mensaje }) => {
     mensajesHTML += `
@@ -158,16 +158,12 @@ enviarMensaje.addEventListener("keyup", ({ keyCode }) => {
     tipo = true;
     socket.emit("enviar-mensaje", { uid, mensaje, tipo });
 
-    socket.on("usuarios-activos", (payload) => {
-      console.log(payload);
-    });
+    socket.on("usuarios-activos", (payload) => {});
   } else {
     tipo = false;
     console.log("llego");
     socket.emit("enviar-mensaje", { uid, mensaje, tipo });
-    socket.on("usuarios-activos", (payload) => {
-      console.log(payload);
-    });
+    socket.on("usuarios-activos", (payload) => {});
   }
 });
 
@@ -200,13 +196,14 @@ juegos.addEventListener("click", (e) => {
   //  entrarSala(obtener);
   console.log("llego");
 
-  socket.on("cargar-todo", "hola");
+  socket.emit("cargar-todo", "hola");
 });
 
 //Listener para cambiar entre ventanas de chat
 
 async function obtenerChat(correo) {
   //obtenemos todos los li de usuarios
+  // socket.emit("grabar-mensajes-privados", correo);
   while (contenedorMensajes.firstChild) {
     contenedorMensajes.removeChild(contenedorMensajes.firstChild);
   }
