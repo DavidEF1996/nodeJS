@@ -56,16 +56,16 @@ async function conectar() {
   });
 
   //Tiene que escuchar los métodos para recibir mensajes y usuarios activos y mensajes privados
-  socket.on("recibir-mensajes", listaMensajes);
+  socket.on("recibir-mensajes", dibujarMensajes);
 
-  socket.on("usuarios-activos", usuariosConectados);
+  socket.on("usuarios-activos", dibujarUsuarios);
 
   socket.on("mensaje-privado", (payload) => {
     console.log(payload);
   });
 }
 
-async function usuariosConectados(usuarios = []) {
+/*async function usuariosConectados(usuarios = []) {
   limpiarHtml();
 
   usuarios.forEach((element) => {
@@ -83,9 +83,34 @@ async function usuariosConectados(usuarios = []) {
       listaUsuariosConectados.appendChild(li);
     }
   });
-}
+}*/
 
-function listaMensajes(mensajes = []) {
+const dibujarUsuarios = (usuarios = []) => {
+  let usersHtml = "";
+  usuarios.forEach(({ nombre, uid, correo }) => {
+    if (usuarioGlobal.uid !== usuarios.uid) {
+      usersHtml += `
+          <li class="users" id="${correo}">
+              <p>
+                  <h5 class="text-success"> ${nombre} </h5>
+                  <span class="fs-6 text-muted">${uid}</span>
+              </p>
+          </li>
+      `;
+    }
+  });
+
+  listaUsuariosConectados.innerHTML = usersHtml;
+  const listaUsuarios = document.querySelectorAll("#ulUsuarios li");
+
+  for (let index = 0; index < listaUsuarios.length; index++) {
+    listaUsuarios[index].onclick = async () => {
+      await obtenerChat(usuarios[index].correo);
+    };
+  }
+};
+
+/*function listaMensajes(mensajes = []) {
   limpiarHtml();
   let mensaje = "";
   mensajes.forEach((element) => {
@@ -99,19 +124,51 @@ function listaMensajes(mensajes = []) {
     `;
   });
   contenedorMensajes.innerHTML = mensaje;
-}
+}*/
+
+const dibujarMensajes = (mensajes = []) => {
+  console.log(mensajes);
+  let mensajesHTML = "";
+  mensajes.forEach(({ nombre, mensaje }) => {
+    mensajesHTML += `
+          <li>
+              <p>
+                  <span class="text-primary">${nombre}: </span>
+                  <span>${mensaje}</span>
+              </p>
+          </li>
+      `;
+  });
+
+  contenedorMensajes.innerHTML = mensajesHTML;
+};
+
 enviarMensaje.addEventListener("keyup", ({ keyCode }) => {
   if (keyCode !== 13) {
     return;
   }
   const mensaje = enviarMensaje.value;
   const uid = idMensaje.textContent;
-  console.log(mensaje, uid);
+  let tipo = false;
+
   if (mensaje.length === 0) {
     return;
   }
-  socket.emit("enviar-mensaje", { uid, mensaje });
-  socket.on("usuarios-activos", usuariosConectados);
+  if (uid.length !== 0) {
+    tipo = true;
+    socket.emit("enviar-mensaje", { uid, mensaje, tipo });
+
+    socket.on("usuarios-activos", (payload) => {
+      console.log(payload);
+    });
+  } else {
+    tipo = false;
+    console.log("llego");
+    socket.emit("enviar-mensaje", { uid, mensaje, tipo });
+    socket.on("usuarios-activos", (payload) => {
+      console.log(payload);
+    });
+  }
 });
 
 function limpiarHtml() {
@@ -138,15 +195,21 @@ function entrarSala(sala = "") {
 //addevenlisteners
 
 juegos.addEventListener("click", (e) => {
-  const obtener = document.querySelector("#videojuegos").id;
+  // const obtener = document.querySelector("#videojuegos").id;
 
-  entrarSala(obtener);
+  //  entrarSala(obtener);
+  console.log("llego");
+
+  socket.on("cargar-todo", "hola");
 });
 
 //Listener para cambiar entre ventanas de chat
 
 async function obtenerChat(correo) {
   //obtenemos todos los li de usuarios
+  while (contenedorMensajes.firstChild) {
+    contenedorMensajes.removeChild(contenedorMensajes.firstChild);
+  }
 
   const chatCon = document.querySelector(".receptor");
   const correoCon = document.querySelector("#correo-chat");
