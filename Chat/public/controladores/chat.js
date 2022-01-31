@@ -1,5 +1,6 @@
 let usuarioGlobal = null; // información del usuario conectado
 let socket = null; //info de el socekt
+let sala = "";
 
 //Variables de interfaz
 const listaUsuariosConectados = document.querySelector("#ulUsuarios");
@@ -7,6 +8,7 @@ const enviarMensaje = document.querySelector("#txtMensaje");
 const idMensaje = document.querySelector("#correo-chat");
 const contenedorMensajes = document.querySelector("#ulMensajes");
 const juegos = document.querySelector("#videojuegos");
+const peliculas = document.querySelector("#peliculas");
 const cine = document.querySelector("#peliculas");
 
 principal();
@@ -127,10 +129,15 @@ const dibujarUsuarios = (usuarios = []) => {
   contenedorMensajes.innerHTML = mensaje;
 }*/
 
-const dibujarMensajes = (mensajes = []) => {
-  let mensajesHTML = "";
-  mensajes.forEach(({ nombre, mensaje }) => {
-    mensajesHTML += `
+const dibujarMensajes = (data = []) => {
+  const { salaGlobal, mensajes = [] } = data;
+
+  console.log(data);
+
+  if (salaGlobal === sala) {
+    let mensajesHTML = "";
+    mensajes.forEach(({ nombre, mensaje }) => {
+      mensajesHTML += `
           <li>
               <p>
                   <span class="text-primary">${nombre}: </span>
@@ -138,9 +145,10 @@ const dibujarMensajes = (mensajes = []) => {
               </p>
           </li>
       `;
-  });
+    });
 
-  contenedorMensajes.innerHTML = mensajesHTML;
+    contenedorMensajes.innerHTML = mensajesHTML;
+  }
 };
 
 enviarMensaje.addEventListener("keyup", ({ keyCode }) => {
@@ -156,13 +164,13 @@ enviarMensaje.addEventListener("keyup", ({ keyCode }) => {
   }
   if (uid.length !== 0) {
     tipo = true;
-    socket.emit("enviar-mensaje", { uid, mensaje, tipo });
+    socket.emit("enviar-mensaje", { uid, mensaje, tipo, sala });
 
     socket.on("usuarios-activos", (payload) => {});
   } else {
     tipo = false;
     console.log("llego");
-    socket.emit("enviar-mensaje", { uid, mensaje, tipo });
+    socket.emit("enviar-mensaje", { uid, mensaje, tipo, sala });
     socket.on("usuarios-activos", (payload) => {});
   }
 });
@@ -192,11 +200,28 @@ function entrarSala(sala = "") {
 
 juegos.addEventListener("click", (e) => {
   // const obtener = document.querySelector("#videojuegos").id;
+  while (contenedorMensajes.firstChild) {
+    contenedorMensajes.removeChild(contenedorMensajes.firstChild);
+  }
 
   //  entrarSala(obtener);
   console.log("llego");
+  sala = "videojuegos";
 
-  socket.emit("cargar-todo", "hola");
+  socket.emit("cargar-todo", sala);
+});
+
+peliculas.addEventListener("click", (e) => {
+  // const obtener = document.querySelector("#videojuegos").id;
+  while (contenedorMensajes.firstChild) {
+    contenedorMensajes.removeChild(contenedorMensajes.firstChild);
+  }
+
+  //  entrarSala(obtener);
+  console.log("llego");
+  sala = "peliculas";
+
+  socket.emit("cargar-todo", sala);
 });
 
 //Listener para cambiar entre ventanas de chat

@@ -6,13 +6,12 @@ const chatMensajes = new ChatMensajes();
 
 //pasamos el io para poder tener una instancia global de nuestro servidor de sockets
 const socketController = async (socket, io) => {
-  console.log("Se vuelve a repetir");
   const usuario = await comprobarJWTSocket(socket.handshake.headers["x-token"]);
 
   if (!usuario) {
     socket.disconnect();
   }
-  console.log(usuario.correo);
+
   //ahora podemos usar una nueva forma de emitir usando el io
 
   //1. Agregar usuario conectado
@@ -23,7 +22,7 @@ const socketController = async (socket, io) => {
   socket.join(usuario.correo);
 
   //CARGAR LISTA DE USUARIOS
-  chatMensajes.cargarChatGlobales();
+  //chatMensajes.cargarChatGlobales();
   io.emit("usuarios-activos", chatMensajes.usuariosConectados);
   io.emit("recibir-mensajes", chatMensajes.ultimos10);
 
@@ -58,10 +57,10 @@ const socketController = async (socket, io) => {
     }
   });*/
 
-  socket.on("enviar-mensaje", ({ uid, mensaje, tipo }) => {
+  socket.on("enviar-mensaje", ({ uid, mensaje, tipo, sala }) => {
     let nombreBase;
     if (uid) {
-      console.log(usuario.nombre);
+      /*console.log(usuario.nombre);
       nombreBase = `de:${usuario.nombre}`;
       console.log(nombreBase);
 
@@ -69,19 +68,48 @@ const socketController = async (socket, io) => {
       chatMensajes.enviarMensajePrivado(usuario.uid, usuario.nombre, mensaje);
       // Mensaje privado
       socket.to(uid).emit("mensaje-privado", { de: usuario.nombre, mensaje });
-      io.emit("recibir-mensajes-privados", chatMensajes.ultimos10Privados);
+      io.emit("recibir-mensajes-privados", chatMensajes.ultimos10Privados);*/
     } else {
       nombreBase = "global";
 
-      chatMensajes.enviarMensaje(usuario.id, usuario.nombre, mensaje);
+      if (sala === "videojuegos") {
+        chatMensajes.enviarMensaje(
+          usuario.id,
+          usuario.nombre,
+          mensaje,
+          "",
+          sala
+        );
+        io.to(sala).emit("recibir-mensajes", {
+          salaGlobal: sala,
 
-      io.to("videojuegos").emit("recibir-mensajes", chatMensajes.ultimos10);
+          mensajes: chatMensajes.obtenerUltimos10(sala),
+        });
+      } else if (sala === "peliculas") {
+        chatMensajes.enviarMensaje(
+          usuario.id,
+          usuario.nombre,
+
+          mensaje,
+          "",
+          sala
+        );
+        io.to(sala).emit("recibir-mensajes", {
+          salaGlobal: sala,
+
+          mensajes: chatMensajes.obtenerUltimos10(sala),
+        });
+      }
     }
   });
 
   socket.on("cargar-todo", (payload) => {
-    socket.join("videojuegos");
-    io.emit("recibir-mensajes", chatMensajes.ultimos10);
+    socket.join(payload);
+
+    socket.emit("recibir-mensajes", {
+      salaGlobal: payload,
+      mensajes: chatMensajes.obtenerUltimos10(payload),
+    });
   });
 
   socket.on("grabar-mensajes-privados", (payload) => {

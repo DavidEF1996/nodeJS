@@ -1,10 +1,11 @@
 const fs = require("fs");
 class Mensaje {
-  constructor(uid, nombre, mensaje, tipo) {
+  constructor(uid, nombre, mensaje, tipo, sala) {
     this.uid = uid;
     this.nombre = nombre;
     this.mensaje = mensaje;
     this.tipo = tipo;
+    this.sala = sala;
   }
 }
 
@@ -27,6 +28,11 @@ class ChatMensajes {
     return this.mensajesPrivados.slice(0, 10);
   }
 
+  obtenerUltimos10(sala) {
+    let arreglo = this.mensajes.filter((filtrado) => filtrado.sala === sala);
+    return arreglo.slice(0, 10);
+  }
+
   get usuariosConectados() {
     return Object.values(this.usuarios); //obtenemos un arreglo de objetos con los usuarios [{},{},{}]
   }
@@ -36,9 +42,9 @@ class ChatMensajes {
     console.log(lista);
     return lista.filter((elemento) => elemento._id !== id);
   }
-  enviarMensaje(uid, nombre, mensaje, tipo) {
+  enviarMensaje(uid, nombre, mensaje, tipo, sala) {
     //para la sala global
-    this.mensajes.unshift(new Mensaje(uid, nombre, mensaje, tipo)); //al arreglo de mensajes le agregamos un objeto de tipo mensaje con sus parámetros
+    this.mensajes.unshift(new Mensaje(uid, nombre, mensaje, tipo, sala)); //al arreglo de mensajes le agregamos un objeto de tipo mensaje con sus parámetros
   }
 
   enviarMensajePrivado(uid, nombre, mensaje, tipo) {
