@@ -18,7 +18,6 @@ async function principal() {
 
 async function validarJWT() {
   const recibirToken = localStorage.getItem("token") || "";
-  console.log("El token de la página: " + recibirToken);
 
   if (recibirToken === "" || recibirToken.length < 10) {
     window.location = "index.html";
@@ -109,6 +108,7 @@ const dibujarUsuarios = (usuarios = []) => {
   for (let index = 0; index < listaUsuarios.length; index++) {
     listaUsuarios[index].onclick = async () => {
       await obtenerChat(usuarios[index].correo);
+      socket.emit("listar-por-usuario", usuarios[index].correo);
     };
   }
 };
@@ -131,14 +131,14 @@ const dibujarUsuarios = (usuarios = []) => {
 
 const dibujarMensajes = (data = []) => {
   const { salaGlobal, mensajes = [] } = data;
+  let mensajesHTML = "";
 
-  console.log(data);
+  const idMensaje = document.querySelector(".receptor").textContent;
 
   if (salaGlobal === sala) {
-    let mensajesHTML = "";
-    mensajes.forEach(({ nombre, mensaje }) => {
+    mensajes.forEach(({ nombre = "", mensaje }) => {
       mensajesHTML += `
-          <li>
+          <li >
               <p>
                   <span class="text-primary">${nombre}: </span>
                   <span>${mensaje}</span>
@@ -148,6 +148,21 @@ const dibujarMensajes = (data = []) => {
     });
 
     contenedorMensajes.innerHTML = mensajesHTML;
+    // if (nombre.trim() == idMensaje.trim()) {
+
+    const listaUsuarios = document.querySelectorAll("#ulMensajes li p");
+    const listaUsu3 = document.querySelectorAll(
+      "#ulMensajes li p .text-primary"
+    );
+
+    for (let index = 0; index < listaUsuarios.length; index++) {
+      if (listaUsu3[index].textContent.split(":")[0] == idMensaje.trim()) {
+        listaUsuarios[index].style.textAlign = "left";
+      } else {
+        listaUsuarios[index].style.textAlign = "right";
+      }
+    }
+    console.log(listaUsuarios.length);
   }
 };
 
@@ -169,7 +184,7 @@ enviarMensaje.addEventListener("keyup", ({ keyCode }) => {
     socket.on("usuarios-activos", (payload) => {});
   } else {
     tipo = false;
-    console.log("llego");
+
     socket.emit("enviar-mensaje", { uid, mensaje, tipo, sala });
     socket.on("usuarios-activos", (payload) => {});
   }
@@ -205,7 +220,7 @@ juegos.addEventListener("click", (e) => {
   }
 
   //  entrarSala(obtener);
-  console.log("llego");
+
   sala = "videojuegos";
 
   socket.emit("cargar-todo", sala);
@@ -218,7 +233,7 @@ peliculas.addEventListener("click", (e) => {
   }
 
   //  entrarSala(obtener);
-  console.log("llego");
+
   sala = "peliculas";
 
   socket.emit("cargar-todo", sala);
@@ -227,6 +242,7 @@ peliculas.addEventListener("click", (e) => {
 //Listener para cambiar entre ventanas de chat
 
 async function obtenerChat(correo) {
+  sala = "privado";
   //obtenemos todos los li de usuarios
   // socket.emit("grabar-mensajes-privados", correo);
   while (contenedorMensajes.firstChild) {
@@ -242,7 +258,7 @@ async function obtenerChat(correo) {
     /* if (listaUsuarios[index].correo === correo) {
       chatCon.value = listaUsuarios.nombre;
     }*/
-    console.log(listaUsuarios[index]);
+
     if (listaUsuarios[index].id === correo) {
       chatCon.textContent = listaUsuarios[index].textContent;
       correoCon.textContent = correo;

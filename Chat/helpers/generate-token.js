@@ -46,7 +46,27 @@ const comprobarJWTSocket = async (token = "") => {
   }
 };
 
+const buscarUsuarioPorCorreo = async (correo = "") => {
+  const usuario = await User.findOne({ correo });
+  if (usuario) {
+    return usuario;
+  } else {
+    return null;
+  }
+};
+
+const buscarUsuarioPorId = async (uid = "") => {
+  const usuario = await User.findById(uid);
+  if (usuario) {
+    return usuario;
+  } else {
+    return null;
+  }
+};
+
 module.exports = {
   generarToken,
   comprobarJWTSocket,
+  buscarUsuarioPorCorreo,
+  buscarUsuarioPorId,
 };

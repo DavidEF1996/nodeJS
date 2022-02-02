@@ -1,5 +1,9 @@
 const { Socket } = require("socket.io");
-const { comprobarJWTSocket } = require("../helpers/generate-token");
+const {
+  comprobarJWTSocket,
+  buscarUsuarioPorCorreo,
+  buscarUsuarioPorId,
+} = require("../helpers/generate-token");
 const ChatMensajes = require("../models/mensajes");
 
 const chatMensajes = new ChatMensajes();
@@ -57,18 +61,26 @@ const socketController = async (socket, io) => {
     }
   });*/
 
-  socket.on("enviar-mensaje", ({ uid, mensaje, tipo, sala }) => {
+  socket.on("enviar-mensaje", async ({ uid, mensaje, tipo, sala }) => {
     let nombreBase;
     if (uid) {
-      /*console.log(usuario.nombre);
-      nombreBase = `de:${usuario.nombre}`;
-      console.log(nombreBase);
+      const busqueda = await buscarUsuarioPorCorreo(uid);
+
+      const involucrados = usuario.id + "-" + busqueda.id;
 
       //chatMensajes.guardarBD(tipo, nombreBase);
-      chatMensajes.enviarMensajePrivado(usuario.uid, usuario.nombre, mensaje);
+      chatMensajes.enviarMensajePrivado(
+        usuario.uid,
+        usuario.nombre,
+        mensaje,
+        involucrados
+      );
       // Mensaje privado
       socket.to(uid).emit("mensaje-privado", { de: usuario.nombre, mensaje });
-      io.emit("recibir-mensajes-privados", chatMensajes.ultimos10Privados);*/
+      io.emit("recibir-mensajes-privados", {
+        salaGlobal: sala == "" ? "privado" : sala,
+        mensajes: chatMensajes.obtenerUltimos10Privados(sala, involucrados),
+      });
     } else {
       nombreBase = "global";
 
@@ -110,6 +122,11 @@ const socketController = async (socket, io) => {
       salaGlobal: payload,
       mensajes: chatMensajes.obtenerUltimos10(payload),
     });
+  });
+
+  socket.on("listar-por-usuario", async (payload) => {
+    const usuario = await buscarUsuarioPorCorreo(payload);
+    console.log();
   });
 
   socket.on("grabar-mensajes-privados", (payload) => {

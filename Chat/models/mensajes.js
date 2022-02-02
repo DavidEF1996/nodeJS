@@ -8,6 +8,14 @@ class Mensaje {
     this.sala = sala;
   }
 }
+class MensajePrivado {
+  constructor(uid, nombre, mensaje, involucrados) {
+    this.uid = uid;
+    this.nombre = nombre;
+    this.mensaje = mensaje;
+    this.involucrados = involucrados;
+  }
+}
 
 class ChatMensajes {
   path = "./database/";
@@ -32,6 +40,20 @@ class ChatMensajes {
     let arreglo = this.mensajes.filter((filtrado) => filtrado.sala === sala);
     return arreglo.slice(0, 10);
   }
+  obtenerUltimos10Privados(sala, involucrados = "") {
+    const opciones = involucrados.split("-");
+    const opcion2 = opciones[1] + "-" + opciones[0];
+
+    console.log(involucrados);
+    console.log(opcion2);
+
+    let arreglo = this.mensajesPrivados.filter(
+      (filtrado) =>
+        filtrado.involucrados === involucrados ||
+        filtrado.involucrados === opcion2
+    );
+    return arreglo.slice(0, 10);
+  }
 
   get usuariosConectados() {
     return Object.values(this.usuarios); //obtenemos un arreglo de objetos con los usuarios [{},{},{}]
@@ -47,9 +69,11 @@ class ChatMensajes {
     this.mensajes.unshift(new Mensaje(uid, nombre, mensaje, tipo, sala)); //al arreglo de mensajes le agregamos un objeto de tipo mensaje con sus parámetros
   }
 
-  enviarMensajePrivado(uid, nombre, mensaje, tipo) {
+  enviarMensajePrivado(uid, nombre, mensaje, involucrados) {
     //para la sala global
-    this.mensajesPrivados.unshift(new Mensaje(uid, nombre, mensaje, tipo)); //al arreglo de mensajes le agregamos un objeto de tipo mensaje con sus parámetros
+    this.mensajesPrivados.unshift(
+      new MensajePrivado(uid, nombre, mensaje, involucrados)
+    ); //al arreglo de mensajes le agregamos un objeto de tipo mensaje con sus parámetros
   }
 
   agregarUsuarios(usuario) {
