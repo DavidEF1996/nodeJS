@@ -63,6 +63,10 @@ async function conectar() {
 
   socket.on("recibir-mensajes-privados", dibujarMensajes);
 
+  /*  socket.on("recibir-mensajes-privados", () => {
+    console.log("llego");
+  });*/
+
   socket.on("mensaje-privado", (payload) => {
     console.log(payload);
   });
@@ -107,8 +111,12 @@ const dibujarUsuarios = (usuarios = []) => {
 
   for (let index = 0; index < listaUsuarios.length; index++) {
     listaUsuarios[index].onclick = async () => {
+      sala = "";
       await obtenerChat(usuarios[index].correo);
-      socket.emit("listar-por-usuario", usuarios[index].correo);
+      socket.emit("listar-por-usuario", {
+        sala,
+        uid: listaUsuarios[index].id,
+      });
     };
   }
 };
@@ -177,6 +185,7 @@ enviarMensaje.addEventListener("keyup", ({ keyCode }) => {
   if (mensaje.length === 0) {
     return;
   }
+console.log("Entro con una longitud de: " + uid);
   if (uid.length !== 0) {
     tipo = true;
     socket.emit("enviar-mensaje", { uid, mensaje, tipo, sala });
@@ -215,6 +224,8 @@ function entrarSala(sala = "") {
 
 juegos.addEventListener("click", (e) => {
   // const obtener = document.querySelector("#videojuegos").id;
+const recept = document.querySelector(".receptor").textContent="...";
+const correoChat = document.querySelector("#correo-chat").textContent="";
   while (contenedorMensajes.firstChild) {
     contenedorMensajes.removeChild(contenedorMensajes.firstChild);
   }
@@ -224,9 +235,12 @@ juegos.addEventListener("click", (e) => {
   sala = "videojuegos";
 
   socket.emit("cargar-todo", sala);
+  
 });
 
 peliculas.addEventListener("click", (e) => {
+const recept = document.querySelector(".receptor").textContent="...";
+const correoChat = document.querySelector("#correo-chat").textContent="";
   // const obtener = document.querySelector("#videojuegos").id;
   while (contenedorMensajes.firstChild) {
     contenedorMensajes.removeChild(contenedorMensajes.firstChild);
@@ -237,6 +251,8 @@ peliculas.addEventListener("click", (e) => {
   sala = "peliculas";
 
   socket.emit("cargar-todo", sala);
+
+  
 });
 
 //Listener para cambiar entre ventanas de chat

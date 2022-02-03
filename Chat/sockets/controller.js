@@ -27,7 +27,7 @@ const socketController = async (socket, io) => {
 
   //CARGAR LISTA DE USUARIOS
   //chatMensajes.cargarChatGlobales();
-  io.emit("usuarios-activos", chatMensajes.usuariosConectados);
+  io.emit("usuarios-activos", chatMensajes.usuariosLista(usuario.id));
   io.emit("recibir-mensajes", chatMensajes.ultimos10);
 
   //LIMPIAR USUARIO DESCONECTADO
@@ -77,7 +77,13 @@ const socketController = async (socket, io) => {
       );
       // Mensaje privado
       socket.to(uid).emit("mensaje-privado", { de: usuario.nombre, mensaje });
-      io.emit("recibir-mensajes-privados", {
+
+      socket.to(busqueda.correo).emit("recibir-mensajes-privados", {
+        salaGlobal: sala == "" ? "privado" : sala,
+        mensajes: chatMensajes.obtenerUltimos10Privados(sala, involucrados),
+      });
+
+      socket.emit("recibir-mensajes-privados", {
         salaGlobal: sala == "" ? "privado" : sala,
         mensajes: chatMensajes.obtenerUltimos10Privados(sala, involucrados),
       });
@@ -125,8 +131,16 @@ const socketController = async (socket, io) => {
   });
 
   socket.on("listar-por-usuario", async (payload) => {
-    const usuario = await buscarUsuarioPorCorreo(payload);
-    console.log();
+    const { sala, uid } = payload;
+
+    const busqueda = await buscarUsuarioPorCorreo(uid);
+
+    const involucrados = usuario.id + "-" + busqueda.id;
+
+    socket.emit("recibir-mensajes-privados", {
+      salaGlobal: sala == "" ? "privado" : sala,
+      mensajes: chatMensajes.obtenerUltimos10Privados(sala, involucrados),
+    });
   });
 
   socket.on("grabar-mensajes-privados", (payload) => {

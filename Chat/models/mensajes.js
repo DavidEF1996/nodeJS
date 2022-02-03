@@ -61,17 +61,17 @@ class ChatMensajes {
 
   usuariosLista(id) {
     const lista = this.usuariosConectados;
-    console.log(lista);
-    return lista.filter((elemento) => elemento._id !== id);
+
+    return lista.filter((elemento) => elemento._id != id);
   }
   enviarMensaje(uid, nombre, mensaje, tipo, sala) {
     //para la sala global
-    this.mensajes.unshift(new Mensaje(uid, nombre, mensaje, tipo, sala)); //al arreglo de mensajes le agregamos un objeto de tipo mensaje con sus parámetros
+    this.mensajes.push(new Mensaje(uid, nombre, mensaje, tipo, sala)); //al arreglo de mensajes le agregamos un objeto de tipo mensaje con sus parámetros
   }
 
   enviarMensajePrivado(uid, nombre, mensaje, involucrados) {
     //para la sala global
-    this.mensajesPrivados.unshift(
+    this.mensajesPrivados.push(
       new MensajePrivado(uid, nombre, mensaje, involucrados)
     ); //al arreglo de mensajes le agregamos un objeto de tipo mensaje con sus parámetros
   }
